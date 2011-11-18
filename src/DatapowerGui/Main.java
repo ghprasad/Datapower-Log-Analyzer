@@ -7,6 +7,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JFileChooser;
+import javax.swing.JTable;
 import javax.swing.UIManager;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
@@ -15,6 +16,9 @@ import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.logging.Logger;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
@@ -24,11 +28,27 @@ import java.awt.Label;
 import java.awt.TextField;
 import javax.swing.JTextArea;
 
+import DatapowerSource.Expression;
+import DatapowerSource.Query;
+import DatapowerSource.XPathCommunicator;
+
 public class Main extends JFrame {
 
 	private JPanel contentPane;
 	private JTextField textField;
-
+    private static int count;
+    private StringBuffer s = new StringBuffer();
+    
+    private JFileChooser fc = new JFileChooser();
+    private JButton btnNewButton = new JButton("Select Log File");
+    private Choice choice = new Choice();
+    private TextField textField_1 = new TextField();
+    private JTextArea textArea = new JTextArea();
+    private  JTable table = new JTable();
+    public HashMap<String,String> hmap = new HashMap<String,String>();
+    public Query datapowerQuery = new Query();
+    private ArrayList<String> list = new ArrayList<String>();
+    
 	/**
 	 * Launch the application.
 	 */
@@ -67,7 +87,7 @@ public class Main extends JFrame {
 		JMenuItem mntmExit = new JMenuItem("Exit");
 		mnFile.add(mntmExit);
 		contentPane = new JPanel();
-		contentPane.setToolTipText("");
+		contentPane.setToolTipText("HI");
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
@@ -78,8 +98,8 @@ public class Main extends JFrame {
 		contentPane.add(textField);
 		textField.setColumns(10);
 		
-		final JFileChooser fc = new JFileChooser();
-		final JButton btnNewButton = new JButton("Select Log File");
+		
+		
 	    
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -90,6 +110,7 @@ public class Main extends JFrame {
 					 
 				   File f = fc.getSelectedFile();
 				   textField.setText(f.getAbsolutePath());			
+				   datapowerQuery.setFile(f.getAbsolutePath());
 			     }
 			    }
 		    }
@@ -101,7 +122,7 @@ public class Main extends JFrame {
 		lblNewLabel.setBounds(28, 83, 73, 36);
 		contentPane.add(lblNewLabel);
 		
-		Choice choice = new Choice();
+		
 		choice.setBounds(144, 91, 168, 52);
 		contentPane.add(choice);
 		
@@ -109,21 +130,59 @@ public class Main extends JFrame {
 		label.setBounds(355, 89, 111, 30);
 		contentPane.add(label);
 		
-		TextField textField_1 = new TextField();
+		
 		textField_1.setBounds(472, 91, 173, 22);
 		contentPane.add(textField_1);
 		
-		JButton btnNewButton_1 = new JButton("Add");
-		btnNewButton_1.setBounds(686, 90, 89, 23);
-		contentPane.add(btnNewButton_1);
 		
-		
-		JTextArea textArea = new JTextArea();
-		textArea.setBounds(146, 156, 499, 70);
+		textArea.setBounds(146, 156, 499, 229);
 		contentPane.add(textArea);
 		choice.add("Tag1");
 		choice.add("Tag2");
 		choice.add("Tag3");
+
+		
+		JButton btnNewButton_1 = new JButton("Add to Filter List");
+	    
+		
+		 btnNewButton_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+			
+			  /*  count++;
+				s.append("Query " + count + ":- ");
+				s.append(choice.getSelectedItem());
+				s.append(" ");
+				s.append(textField_1.getText());
+				hmap.put(choice.getSelectedItem(),textField_1.getText());
+				s.append("\n");
+				textArea.setText(s.toString());*/
+				datapowerQuery.expressionList.add(new Expression(choice.getSelectedItem(),textField_1.getText()));
+				textField_1.setText(" ");
+			}
+		});
+		btnNewButton_1.setBounds(665, 90, 117, 23);
+		contentPane.add(btnNewButton_1);
+		
+		JButton btnNewButton_2 = new JButton("Get Details");
+		btnNewButton_2.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				XPathCommunicator x = new XPathCommunicator(datapowerQuery.getFile());
+	            list = x.getOutput(datapowerQuery);
+	            System.out.println(list.toString());
+	            for(String s1 : list){
+	            	s.append(s1);
+	            	
+	            	s.append("\n");
+	            	
+	            }
+	            textArea.setText(s.toString());
+			}
+		});
+		btnNewButton_2.setBounds(38, 130, 89, 23);
+		contentPane.add(btnNewButton_2);
+		
+		
+		
 		
 		
 		
